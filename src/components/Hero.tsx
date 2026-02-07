@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { hero, site } from "@/data/portfolio";
 
 export default function Hero() {
@@ -13,18 +13,27 @@ export default function Hero() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start start", "end start"] });
   const textY = useTransform(scrollYProgress, [0, 1], [0, 24]);
-  const imgY = useTransform(scrollYProgress, [0, 1], [0, 60]);
-  const imgScale = useTransform(scrollYProgress, [0, 1], [1, 1.08]);
+  const imgY = useTransform(scrollYProgress, [0, 1], [0, 50]);
+  const imgScale = useTransform(scrollYProgress, [0, 1], [1, 1.02]);
   const glowOpacity = useTransform(scrollYProgress, [0, 1], [0.35, 0.15]);
   const bgParallaxY = useTransform(scrollYProgress, [0, 1], [0, -80]);
+
+  // Disable parallax on small screens to avoid mobile jitter/vibration
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const update = () => setIsMobile(window.innerWidth < 768);
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
 
   return (
     <section id="hero" ref={sectionRef} className="hero-gradient relative min-h-[100vh] pt-20 pb-24 md:min-h-[95vh] md:pt-24 md:pb-32">
       {/* Parallax mesh overlay */}
       <motion.div
         aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{ y: bgParallaxY }}
+        className="pointer-events-none absolute inset-0 transform-gpu"
+        style={isMobile ? undefined : { y: bgParallaxY, willChange: "transform" }}
       >
         <div className="absolute left-1/2 top-[10%] h-64 w-64 -translate-x-1/2 rounded-full bg-cyan-500/10 blur-3xl" />
       </motion.div>
@@ -32,11 +41,11 @@ export default function Hero() {
         <div className="grid items-center gap-12 lg:grid-cols-10 lg:gap-16">
           {/* Copy — Apple-style staggered entrance with slight parallax */}
           <motion.div
-            className="lg:col-span-6"
+            className="lg:col-span-6 transform-gpu"
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
-            style={{ y: textY }}
+            style={isMobile ? undefined : { y: textY, willChange: "transform" }}
           >
             <motion.p
               className="mb-5 inline-block rounded-full border border-cyan-500/40 bg-cyan-500/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-cyan-400"
@@ -125,17 +134,23 @@ export default function Hero() {
 
           {/* Profile photo — use profile.png (transparent BG) or profile.jpeg / profile.jpg */}
           <motion.div
-            className={isPng ? "lg:col-span-4 flex justify-center pl-4 md:pl-6" : "lg:col-span-4 flex justify-center lg:justify-end pl-4 md:pl-6"}
+            className={
+              (isPng ? "lg:col-span-4 flex justify-center pl-4 md:pl-6" : "lg:col-span-4 flex justify-center lg:justify-end pl-4 md:pl-6") +
+              " transform-gpu"
+            }
             initial={{ opacity: 0, scale: 0.98, y: 12 }}
             whileInView={{ opacity: 1, scale: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.5 }}
+            viewport={{ once: true, amount: 0.05 }}
             transition={{ duration: 0.7, ease: "easeOut", delay: 0.25 }}
-            style={{ y: imgY, scale: imgScale }}
+            style={isMobile ? undefined : { y: imgY, scale: imgScale, willChange: "transform" }}
           >
             <div className="relative">
-              <motion.div className="absolute -inset-1 rounded-3xl bg-gradient-to-br from-cyan-500/30 to-transparent blur-xl" style={{ opacity: glowOpacity }} />
               <motion.div
-                className="relative overflow-hidden rounded-2xl border border-zinc-700/80 bg-transparent shadow-2xl ring-1 ring-zinc-700/50 pl-4 md:pl-6 pr-2 md:pr-3"
+                className="absolute -inset-1 rounded-3xl bg-gradient-to-br from-cyan-500/30 to-transparent blur-xl"
+                style={isMobile ? undefined : { opacity: glowOpacity, willChange: "opacity" }}
+              />
+              <motion.div
+                className="relative overflow-hidden rounded-2xl border border-zinc-700/80 bg-transparent shadow-2xl ring-1 ring-zinc-700/50 pl-4 md:pl-6 pr-2 md:pr-3 transform-gpu"
                 whileHover={{ scale: 1.015 }}
                 transition={{ type: "spring", stiffness: 220, damping: 20 }}
               >

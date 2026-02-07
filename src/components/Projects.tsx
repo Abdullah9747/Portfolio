@@ -10,7 +10,7 @@ export default function Projects() {
           <h2 className="mb-12 text-3xl font-bold text-zinc-100">Projects</h2>
         </Reveal>
 
-        <Reveal>
+        <Reveal amount={0.01}>
           <div className="mb-16">
             <FeaturedProject />
           </div>

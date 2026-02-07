@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { featuredProject } from "@/data/portfolio";
 
 const PLACEHOLDER = "/observia/placeholder.svg";
@@ -12,13 +12,50 @@ export default function FeaturedProject() {
   const companyUrl = featuredProject.companyUrl;
   const videoItem = featuredProject.media.find((m) => m.type === "video");
   const imageItems = featuredProject.media.filter((m) => m.type === "image");
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [showControls, setShowControls] = useState(false);
+  const cardRef = useRef<HTMLDivElement | null>(null);
+
+  const tryAutoplay = () => {
+    const v = videoRef.current;
+    if (!v) return;
+    const p = v.play();
+    if (p && typeof p.catch === "function") {
+      p.catch(() => setShowControls(true));
+    }
+  };
+
+  useEffect(() => {
+    // Attempt autoplay when mounted (muted + playsInline should allow on mobile Safari/Chrome)
+    tryAutoplay();
+  }, []);
+
+  useEffect(() => {
+    // Start playback as soon as the card enters the viewport
+    const el = cardRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            tryAutoplay();
+            observer.disconnect();
+            break;
+          }
+        }
+      },
+      { threshold: 0.05 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   const handleMediaError = (src: string) => {
     setFailedSrcs((prev) => new Set(prev).add(src));
   };
 
   return (
-    <article className="overflow-hidden rounded-2xl border border-zinc-700/80 bg-zinc-900/40">
+    <article ref={cardRef} className="overflow-hidden rounded-2xl border border-zinc-700/80 bg-zinc-900/40">
       <div className="grid gap-0 lg:grid-cols-5">
         {/* Copy */}
         <div className="flex flex-col justify-center p-8 lg:col-span-2 lg:p-10">
@@ -59,6 +96,7 @@ export default function FeaturedProject() {
           <div className="group relative overflow-hidden rounded-xl border border-zinc-700/60 bg-zinc-800/50">
             {videoItem && !failedSrcs.has(videoItem.src) ? (
               <video
+                ref={videoRef}
                 src={videoItem.src}
                 poster={"poster" in videoItem ? videoItem.poster : undefined}
                 className="h-full w-full object-cover object-center"
@@ -66,8 +104,11 @@ export default function FeaturedProject() {
                 muted
                 loop
                 autoPlay
+                controls={showControls}
+                onLoadedData={tryAutoplay}
+                onPlay={() => setShowControls(false)}
                 onError={() => handleMediaError(videoItem.src)}
-                preload="auto"
+                preload="metadata"
               />
             ) : null}
             {videoItem && failedSrcs.has(videoItem.src) && (
