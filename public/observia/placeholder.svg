@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" fill="none">
+  <rect width="400" height="300" fill="#27272a"/>
+  <text x="200" y="155" font-family="system-ui,sans-serif" font-size="14" fill="#71717a" text-anchor="middle">Observia</text>
+  <text x="200" y="175" font-family="system-ui,sans-serif" font-size="12" fill="#52525b" text-anchor="middle">Add your image or video</text>
+</svg>
