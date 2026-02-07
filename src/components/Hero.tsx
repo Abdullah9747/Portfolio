@@ -2,41 +2,94 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { useRef, useState } from "react";
 import { hero, site } from "@/data/portfolio";
 
 export default function Hero() {
   // Try profile.png first (transparent BG), then profile.jpeg, profile.jpg, then placeholder
   const [profileSrc, setProfileSrc] = useState<"/profile.png" | "/profile.jpeg" | "/profile.jpg" | null>("/profile.png");
   const isPng = profileSrc === "/profile.png";
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start start", "end start"] });
+  const textY = useTransform(scrollYProgress, [0, 1], [0, 24]);
+  const imgY = useTransform(scrollYProgress, [0, 1], [0, 60]);
+  const imgScale = useTransform(scrollYProgress, [0, 1], [1, 1.08]);
+  const glowOpacity = useTransform(scrollYProgress, [0, 1], [0.35, 0.15]);
+  const bgParallaxY = useTransform(scrollYProgress, [0, 1], [0, -80]);
 
   return (
-    <section id="hero" className="hero-gradient relative min-h-[100vh] pt-20 pb-24 md:min-h-[95vh] md:pt-24 md:pb-32">
+    <section id="hero" ref={sectionRef} className="hero-gradient relative min-h-[100vh] pt-20 pb-24 md:min-h-[95vh] md:pt-24 md:pb-32">
+      {/* Parallax mesh overlay */}
+      <motion.div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{ y: bgParallaxY }}
+      >
+        <div className="absolute left-1/2 top-[10%] h-64 w-64 -translate-x-1/2 rounded-full bg-cyan-500/10 blur-3xl" />
+      </motion.div>
       <div className="mx-auto max-w-6xl px-6">
         <div className="grid items-center gap-12 lg:grid-cols-10 lg:gap-16">
-          {/* Copy — company-style */}
-          <div className="lg:col-span-6">
-            <p className="mb-5 inline-block rounded-full border border-cyan-500/40 bg-cyan-500/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-cyan-400">
+          {/* Copy — Apple-style staggered entrance with slight parallax */}
+          <motion.div
+            className="lg:col-span-6"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            style={{ y: textY }}
+          >
+            <motion.p
+              className="mb-5 inline-block rounded-full border border-cyan-500/40 bg-cyan-500/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-cyan-400"
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.6 }}
+              transition={{ duration: 0.5, ease: "easeOut", delay: 0.05 }}
+            >
               {hero.badge}
-            </p>
-            <h1 className="mb-6 text-4xl font-bold leading-[1.15] tracking-tight text-zinc-100 sm:text-5xl lg:text-6xl xl:text-7xl">
+            </motion.p>
+            <motion.h1
+              className="mb-6 text-4xl font-bold leading-[1.15] tracking-tight text-zinc-100 sm:text-5xl lg:text-6xl xl:text-7xl"
+              initial={{ opacity: 0, y: 18 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.6 }}
+              transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
+            >
               {hero.headline}
-            </h1>
-            <p className="mb-8 max-w-xl text-lg leading-relaxed text-zinc-400 sm:text-xl">
+            </motion.h1>
+            <motion.p
+              className="mb-8 max-w-xl text-lg leading-relaxed text-zinc-400 sm:text-xl"
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.6 }}
+              transition={{ duration: 0.6, ease: "easeOut", delay: 0.15 }}
+            >
               {hero.subheadline}
-            </p>
-            <ul className="mb-10 flex flex-wrap gap-4">
+            </motion.p>
+            <motion.ul
+              className="mb-10 flex flex-wrap gap-4"
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: true, amount: 0.4 }}
+              variants={{ hidden: {}, show: { transition: { staggerChildren: 0.06 } } }}
+            >
               {hero.valueProps.map((prop, i) => (
-                <li
+                <motion.li
                   key={i}
                   className="flex items-center gap-2 text-sm text-zinc-500"
+                  variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0 } }}
                 >
                   <span className="h-1.5 w-1.5 rounded-full bg-cyan-500" />
                   {prop}
-                </li>
+                </motion.li>
               ))}
-            </ul>
-            <div className="flex flex-wrap gap-4">
+            </motion.ul>
+            <motion.div
+              className="flex flex-wrap gap-4"
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.6 }}
+              transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
+            >
               <Link
                 href="#contact"
                 className="inline-flex items-center gap-2 rounded-xl bg-cyan-500 px-7 py-3.5 text-sm font-semibold text-zinc-950 shadow-lg shadow-cyan-500/20 transition hover:bg-cyan-400 hover:shadow-cyan-500/30"
@@ -67,14 +120,25 @@ export default function Hero() {
               >
                 <GitHubIcon />
               </a>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
           {/* Profile photo — use profile.png (transparent BG) or profile.jpeg / profile.jpg */}
-          <div className={isPng ? "lg:col-span-4 flex justify-center pl-4 md:pl-6" : "lg:col-span-4 flex justify-center lg:justify-end pl-4 md:pl-6"}>
+          <motion.div
+            className={isPng ? "lg:col-span-4 flex justify-center pl-4 md:pl-6" : "lg:col-span-4 flex justify-center lg:justify-end pl-4 md:pl-6"}
+            initial={{ opacity: 0, scale: 0.98, y: 12 }}
+            whileInView={{ opacity: 1, scale: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.5 }}
+            transition={{ duration: 0.7, ease: "easeOut", delay: 0.25 }}
+            style={{ y: imgY, scale: imgScale }}
+          >
             <div className="relative">
-              <div className="absolute -inset-1 rounded-3xl bg-gradient-to-br from-cyan-500/30 to-transparent blur-xl" />
-              <div className="relative overflow-hidden rounded-2xl border border-zinc-700/80 bg-transparent shadow-2xl ring-1 ring-zinc-700/50 pl-4 md:pl-6 pr-2 md:pr-3">
+              <motion.div className="absolute -inset-1 rounded-3xl bg-gradient-to-br from-cyan-500/30 to-transparent blur-xl" style={{ opacity: glowOpacity }} />
+              <motion.div
+                className="relative overflow-hidden rounded-2xl border border-zinc-700/80 bg-transparent shadow-2xl ring-1 ring-zinc-700/50 pl-4 md:pl-6 pr-2 md:pr-3"
+                whileHover={{ scale: 1.015 }}
+                transition={{ type: "spring", stiffness: 220, damping: 20 }}
+              >
                 {profileSrc ? (
                   <Image
                     src={profileSrc}
@@ -98,9 +162,9 @@ export default function Hero() {
                     className="aspect-square w-full max-w-[340px] object-cover object-center md:max-w-[420px]"
                   />
                 )}
-              </div>
+              </motion.div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
     </section>
