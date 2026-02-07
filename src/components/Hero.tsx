@@ -6,15 +6,16 @@ import { useState } from "react";
 import { hero, site } from "@/data/portfolio";
 
 export default function Hero() {
-  // Try profile.jpeg first, then profile.jpg, then placeholder
-  const [profileSrc, setProfileSrc] = useState<"/profile.jpeg" | "/profile.jpg" | null>("/profile.jpeg");
+  // Try profile.png first (transparent BG), then profile.jpeg, profile.jpg, then placeholder
+  const [profileSrc, setProfileSrc] = useState<"/profile.png" | "/profile.jpeg" | "/profile.jpg" | null>("/profile.png");
+  const isPng = profileSrc === "/profile.png";
 
   return (
-    <section id="hero" className="hero-gradient relative min-h-[100vh] pt-28 pb-24 md:min-h-[95vh] md:pt-36 md:pb-32">
+    <section id="hero" className="hero-gradient relative min-h-[100vh] pt-20 pb-24 md:min-h-[95vh] md:pt-24 md:pb-32">
       <div className="mx-auto max-w-6xl px-6">
-        <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
+        <div className="grid items-center gap-12 lg:grid-cols-10 lg:gap-16">
           {/* Copy — company-style */}
-          <div>
+          <div className="lg:col-span-6">
             <p className="mb-5 inline-block rounded-full border border-cyan-500/40 bg-cyan-500/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-cyan-400">
               {hero.badge}
             </p>
@@ -69,21 +70,22 @@ export default function Hero() {
             </div>
           </div>
 
-          {/* Profile photo — supports profile.jpeg or profile.jpg */}
-          <div className="flex justify-center lg:justify-end">
+          {/* Profile photo — use profile.png (transparent BG) or profile.jpeg / profile.jpg */}
+          <div className={isPng ? "lg:col-span-4 flex justify-center pl-4 md:pl-6" : "lg:col-span-4 flex justify-center lg:justify-end pl-4 md:pl-6"}>
             <div className="relative">
               <div className="absolute -inset-1 rounded-3xl bg-gradient-to-br from-cyan-500/30 to-transparent blur-xl" />
-              <div className="relative overflow-hidden rounded-2xl border border-zinc-700/80 bg-zinc-900/80 shadow-2xl ring-1 ring-zinc-700/50">
+              <div className="relative overflow-hidden rounded-2xl border border-zinc-700/80 bg-transparent shadow-2xl ring-1 ring-zinc-700/50 pl-4 md:pl-6">
                 {profileSrc ? (
                   <Image
                     src={profileSrc}
                     alt={`${site.name} — ${site.tagline}`}
-                    width={480}
-                    height={480}
+                    width={640}
+                    height={640}
                     priority
-                    className="aspect-square w-full max-w-[320px] object-cover md:max-w-[380px]"
+                    className="aspect-square w-full max-w-[380px] object-cover object-center md:max-w-[460px]"
                     onError={() => {
-                      if (profileSrc === "/profile.jpeg") setProfileSrc("/profile.jpg");
+                      if (profileSrc === "/profile.png") setProfileSrc("/profile.jpeg");
+                      else if (profileSrc === "/profile.jpeg") setProfileSrc("/profile.jpg");
                       else setProfileSrc(null);
                     }}
                   />
@@ -93,7 +95,7 @@ export default function Hero() {
                     alt={`${site.name}`}
                     width={480}
                     height={480}
-                    className="aspect-square w-full max-w-[320px] object-cover md:max-w-[380px]"
+                    className="aspect-square w-full max-w-[340px] object-cover object-center md:max-w-[420px]"
                   />
                 )}
               </div>

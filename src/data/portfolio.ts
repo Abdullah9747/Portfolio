@@ -11,24 +11,24 @@ export const site = {
 
 export const hero = {
   badge: "AI & Machine Learning",
-  headline: "We build AI systems that solve real problems.",
+  headline: "I build AI systems that solve real problems.",
   subheadline:
-    "From computer vision and NLP to RAG, LLMs, and full-stack applications—we design, develop, and deploy intelligent solutions for your business.",
+    "From computer vision and NLP to RAG, LLMs, and full-stack applications—I design, develop, and deploy intelligent solutions for your business.",
   valueProps: [
     "ML, NLP & Computer Vision",
     "RAG & LLM Integration",
     "Production-Ready Systems",
   ],
   cta: "Start a project",
-  ctaSecondary: "View our work",
+  ctaSecondary: "View my work",
 } as const;
 
 export const about = {
   title: "About",
   paragraphs: [
-    "We build AI systems that turn data into decisions—computer vision pipelines, RAG and chatbots, fine-tuned LLMs, and full-stack applications that scale.",
-    "Our focus is on taking ideas from prototype to production: robust ML and NLP solutions, clear architecture, and delivery that fits your timeline and goals.",
-    "Whether you need a proof of concept, an integration with existing systems, or a full build, we help you ship AI that works.",
+    "I build AI systems that turn data into decisions—computer vision pipelines, RAG and chatbots, fine-tuned LLMs, and full-stack applications that scale.",
+    "My focus is on taking ideas from prototype to production: robust ML and NLP solutions, clear architecture, and delivery that fits your timeline and goals.",
+    "Whether you need a proof of concept, an integration with existing systems, or a full build, I help you ship AI that works.",
   ],
 } as const;
 
