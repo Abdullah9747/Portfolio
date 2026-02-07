@@ -10,6 +10,8 @@ export default function FeaturedProject() {
   const [failedSrcs, setFailedSrcs] = useState<Set<string>>(new Set());
   const projectUrl = featuredProject.projectUrl;
   const companyUrl = featuredProject.companyUrl;
+  const videoItem = featuredProject.media.find((m) => m.type === "video");
+  const imageItems = featuredProject.media.filter((m) => m.type === "image");
 
   const handleMediaError = (src: string) => {
     setFailedSrcs((prev) => new Set(prev).add(src));
@@ -51,56 +53,49 @@ export default function FeaturedProject() {
           </div>
         </div>
 
-        {/* Media: video on top (no controls, autoplay loop), then images below */}
-        <div className="grid grid-cols-2 gap-2 p-4 lg:col-span-3 lg:gap-3 lg:p-6">
-          {featuredProject.media.map((item, i) => (
-            <div
-              key={i}
-              className={`group relative aspect-video overflow-hidden rounded-xl border border-zinc-700/60 bg-zinc-800/50 ${i === 0 ? "col-span-2" : ""}`}
-            >
-              {item.type === "video" ? (
-                <>
-                  {!failedSrcs.has(item.src) ? (
-                    <video
-                      src={item.src}
-                      poster={"poster" in item ? item.poster : undefined}
-                      className="h-full w-full object-cover"
-                      playsInline
-                      muted
-                      loop
-                      autoPlay
-                      onError={() => handleMediaError(item.src)}
-                      preload="auto"
-                    />
-                  ) : null}
-                  {failedSrcs.has(item.src) && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-zinc-800">
-                      <img src={PLACEHOLDER} alt={item.alt} className="h-full w-full object-cover opacity-80" />
-                    </div>
-                  )}
-                </>
-              ) : (
-                <>
-                  {!failedSrcs.has(item.src) ? (
-                    <Image
-                      src={item.src}
-                      alt={item.alt}
-                      fill
-                      className="object-cover transition group-hover:scale-105"
-                      sizes="(max-width: 768px) 50vw, 33vw"
-                      onError={() => handleMediaError(item.src)}
-                    />
-                  ) : (
-                    <img
-                      src={PLACEHOLDER}
-                      alt={item.alt}
-                      className="h-full w-full object-cover"
-                    />
-                  )}
-                </>
-              )}
-            </div>
-          ))}
+        {/* Media: video on the left, images stacked on the right */}
+        <div className="grid grid-cols-1 gap-2 p-4 lg:col-span-3 lg:grid-cols-2 lg:gap-3 lg:p-6">
+          {/* Left: Video */}
+          <div className="group relative overflow-hidden rounded-xl border border-zinc-700/60 bg-zinc-800/50">
+            {videoItem && !failedSrcs.has(videoItem.src) ? (
+              <video
+                src={videoItem.src}
+                poster={"poster" in videoItem ? videoItem.poster : undefined}
+                className="h-full w-full object-cover object-center"
+                playsInline
+                muted
+                loop
+                autoPlay
+                onError={() => handleMediaError(videoItem.src)}
+                preload="auto"
+              />
+            ) : null}
+            {videoItem && failedSrcs.has(videoItem.src) && (
+              <div className="absolute inset-0 flex items-center justify-center bg-zinc-800">
+                <img src={PLACEHOLDER} alt={videoItem.alt} className="h-full w-full object-cover opacity-80" />
+              </div>
+            )}
+          </div>
+
+          {/* Right: Stacked images */}
+          <div className="grid grid-rows-2 gap-2 lg:gap-3">
+            {imageItems.map((item, i) => (
+              <div key={`img-${i}`} className="group relative aspect-video overflow-hidden rounded-xl border border-zinc-700/60 bg-zinc-800/50">
+                {!failedSrcs.has(item.src) ? (
+                  <Image
+                    src={item.src}
+                    alt={item.alt}
+                    fill
+                    className="object-cover transition group-hover:scale-105"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    onError={() => handleMediaError(item.src)}
+                  />
+                ) : (
+                  <img src={PLACEHOLDER} alt={item.alt} className="h-full w-full object-cover" />
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 

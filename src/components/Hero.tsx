@@ -74,7 +74,7 @@ export default function Hero() {
           <div className={isPng ? "lg:col-span-4 flex justify-center pl-4 md:pl-6" : "lg:col-span-4 flex justify-center lg:justify-end pl-4 md:pl-6"}>
             <div className="relative">
               <div className="absolute -inset-1 rounded-3xl bg-gradient-to-br from-cyan-500/30 to-transparent blur-xl" />
-              <div className="relative overflow-hidden rounded-2xl border border-zinc-700/80 bg-transparent shadow-2xl ring-1 ring-zinc-700/50 pl-4 md:pl-6">
+              <div className="relative overflow-hidden rounded-2xl border border-zinc-700/80 bg-transparent shadow-2xl ring-1 ring-zinc-700/50 pl-4 md:pl-6 pr-2 md:pr-3">
                 {profileSrc ? (
                   <Image
                     src={profileSrc}
